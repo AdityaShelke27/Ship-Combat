@@ -27,7 +27,7 @@ public class ShootCannon : MonoBehaviour
             {
                 m_Angle += Input.GetAxis("Mouse Y");
                 m_Angle = Mathf.Clamp(m_Angle, 20, 80);
-                if (Input.GetAxis("Mouse Y") != 0)
+                if(Input.GetAxis("Mouse Y") != 0)
                 {
                     ShowMarker();
                 }
@@ -39,7 +39,7 @@ public class ShootCannon : MonoBehaviour
                 {
                     Destroy(m_CannonPos.GetChild(i).gameObject);
                 }
-                if(m_CamPos.rotation.y > 0)
+                if(m_CamPos.rotation.eulerAngles.y <= 180)
                 {
                     StartCoroutine(FireRight());
                 }
@@ -58,18 +58,19 @@ public class ShootCannon : MonoBehaviour
 
         float time = yVel / -Physics.gravity.y;
         float xPos = xVel * time;
-        if(m_CamPos.rotation.y > 0)
+        
+        if(m_CamPos.rotation.eulerAngles.y <= 180)
         {
             for (int x = 0; x <= 2 * xPos; x += 2)
             {
                 float yCod = x * Mathf.Tan(m_Angle * Mathf.Deg2Rad) + (0.5f * Physics.gravity.y * ((x * x) / (xVel * xVel)));
                 if (x / 2 < m_CannonPos.childCount)
                 {
-                    m_CannonPos.GetChild(x / 2).position = transform.position + new Vector3(x, yCod, 0);
+                    m_CannonPos.GetChild(x / 2).position = transform.position + transform.right * x + new Vector3(0, yCod, 0);
                 }
                 else
                 {
-                    Instantiate(m_Marker, transform.position + new Vector3(x, yCod, 0), Quaternion.identity, m_CannonPos);
+                    Instantiate(m_Marker, transform.position + transform.right * x + new Vector3(0, yCod, 0), Quaternion.identity, m_CannonPos);
                 }
             }
         }
@@ -80,11 +81,11 @@ public class ShootCannon : MonoBehaviour
                 float yCod = x * Mathf.Tan(m_Angle * Mathf.Deg2Rad) + (0.5f * Physics.gravity.y * ((x * x) / (xVel * xVel)));
                 if (x / 2 < m_CannonPos.childCount)
                 {
-                    m_CannonPos.GetChild(x / 2).position = transform.position + new Vector3(-x, yCod, 0);
+                    m_CannonPos.GetChild(x / 2).position = transform.position + transform.right * -x + new Vector3(0, yCod, 0);
                 }
                 else
                 {
-                    Instantiate(m_Marker, transform.position + new Vector3(-x, yCod, 0), Quaternion.identity, m_CannonPos);
+                    Instantiate(m_Marker, transform.position + transform.right * -x + new Vector3(0, yCod, 0), Quaternion.identity, m_CannonPos);
                 }
             }
         }
@@ -101,7 +102,7 @@ public class ShootCannon : MonoBehaviour
         {
             foreach(Transform point in m_RightCannons)
             {
-                point.rotation = Quaternion.Euler(0, 0, Mathf.Rad2Deg * Mathf.Sin(m_Angle * Mathf.Deg2Rad) - 90);
+                point.localRotation = Quaternion.Euler(0, 0, Mathf.Rad2Deg * Mathf.Sin(m_Angle * Mathf.Deg2Rad) - 45);
                 GameObject _ball = Instantiate(m_Ball, point.position, point.rotation);
                 _ball.GetComponent<Rigidbody>().velocity = _ball.transform.up * m_Speed;
 
@@ -117,7 +118,7 @@ public class ShootCannon : MonoBehaviour
         {
             foreach (Transform point in m_LeftCannons)
             {
-                point.rotation = Quaternion.Euler(0, 0, Mathf.Rad2Deg * Mathf.Sin(m_Angle * Mathf.Deg2Rad));
+                point.localRotation = Quaternion.Euler(0, 0, 45 - (Mathf.Rad2Deg * Mathf.Sin(m_Angle * Mathf.Deg2Rad)));
                 GameObject _ball = Instantiate(m_Ball, point.position, point.rotation);
                 _ball.GetComponent<Rigidbody>().velocity = _ball.transform.up * m_Speed;
 
